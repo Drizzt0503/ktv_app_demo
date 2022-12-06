@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -22,6 +23,7 @@ public class VisualizerView extends View {
     private int width; // width of this View
     private int height; // height of this View
     private final Paint linePaint2; // specifies line drawing characteristic
+    private List<List<Float>> segment = new ArrayList<>();
 
     // constructor
     public VisualizerView(Context context, AttributeSet attrs) {
@@ -32,7 +34,9 @@ public class VisualizerView extends View {
         linePaint.setStrokeWidth(LINE_WIDTH); // set stroke width
         linePaint2.setStrokeWidth(3f);
         linePaint2.setColor(Color.RED);
+        linePaint2.setStyle(Paint.Style.STROKE);
         setContentDescription(null);
+        segment.add(Arrays.asList(100f,100f,100f));
     }
 
     // called when the dimensions of the View change
@@ -50,7 +54,9 @@ public class VisualizerView extends View {
         amplitudes.clear();
         invalidate();
     }
-
+    public void addback(List<List<Float>> seg) {
+        segment = seg;
+    }
 
      //@param amplitude Adds the given amplitude value to the amplitudes ArrayList
 
@@ -66,20 +72,29 @@ public class VisualizerView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         if (amplitudes.isEmpty()) canvas.drawColor(Color.TRANSPARENT);
-
+       // if (amplitudes.size() * LINE_WIDTH >= width) {
+        //    amplitudes.remove(0); // remove oldest power value
+       // }
         int middle = height / 2; // get the middle of the View
+        float height2 = height-50;
+        float heightre = height2/18f;
+        float widthre = (width-100)/10;
         float curX = 0; // start curX at zero
-
+        if(!(segment.isEmpty())) {
+            for (List<Float> segline : segment) {
+                float a = segline.get(0) * widthre;
+                float b = segline.get(1) * widthre;
+                float c = (segline.get(2) +0.5f)* heightre;
+                canvas.drawRect(a, height2*70.5f/18f-c, b, height2*70.5f/18f-c+height2/18f , linePaint2);
+            }
+        }
         // for each item in the amplitudes ArrayList
         for (float power : amplitudes) {
-            float scaledHeight = power / LINE_SCALE; // scale the power
-            curX += LINE_WIDTH; // increase X by LINE_WIDTH
+            float scaledHeight = power*heightre; // scale the power
+            curX += 5.53f; // increase X by LINE_WIDTH
 
-            // draw a line representing this item in the amplitudes ArrayList
-            canvas.drawLine(curX, middle - scaledHeight / 2+3 , curX, middle - scaledHeight / 2, linePaint);
-
-
-            canvas.drawCircle(240f, 240f, 150f, linePaint2);
+            // draw a line representing this item in the amplitudes ArrayLis
+            canvas.drawLine(curX, height2*70.5f/18f - scaledHeight , curX+5.53f, height2*70.5f/18f - scaledHeight, linePaint);
         }
     }
 

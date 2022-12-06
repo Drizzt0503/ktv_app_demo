@@ -18,7 +18,12 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 import android.widget.TextView;
 import com.example.videoview.VisualizerView;
-import android.content.Context;
+import com.opencsv.CSVReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -26,18 +31,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private VideoView videoView;
     private Button btn_start;
     private Button btn_pause;
-    private Button btn_stop;
     private LinearLayout visLayout;
     private VisualizerView visView ;
-
+    private TextView text2;
+    private List<List<Float>> barChart = new ArrayList<>();
+    private List<List<Float>> barChart2 = new ArrayList<>();
+    private List<List<List<Float>>> segChart = new ArrayList<>();
+    private int nframe = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindViews();
+        text2 = (TextView) findViewById(R.id.textView2);
         visView = new VisualizerView(getApplicationContext(),null);
+        visLayout.removeAllViews();
+        visLayout.addView(visView);
+        readCSVAndChop();
+        for (List<Float> rebar : barChart) {
+            if ( Math.floor(rebar.get(1)/10)-Math.floor(rebar.get(0)/10) == 1){
+                float tens = (float)Math.floor(rebar.get(1)/10)*10;
+                barChart2.add(Arrays.asList(rebar.get(0),tens,rebar.get(2)));
+                barChart2.add(Arrays.asList(tens,rebar.get(1),rebar.get(2)));
+            }
+            else{
+                barChart2.add(rebar);
+            }
+        }
+        for (int i = 0; i*10 < barChart2.get(barChart2.size()-1).get(0); i++) {
+            List<List<Float>> temp= new ArrayList<>();
+            for (List<Float> bar : barChart2) {
+                if(bar.get(0)/10 < i+1 && bar.get(0)/10 >= i) {
+                    float aa = bar.get(0)-i*10;
+                    float ab = bar.get(1)-i*10;
+                    temp.add(Arrays.asList(aa,ab,bar.get(2)));
+                }
+            }
+            segChart.add(temp);
+        }
         AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-
         dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, new PitchDetectionHandler() {
 
             @Override
@@ -47,19 +79,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 runOnUiThread( new Runnable(){
                     @Override
                     public void run() {
+                        double semitone;
+                        if(pitchInHz < 0.000001f){
+                            semitone = 0;
+                        }
+                        else{
+                            semitone = 69 + 12 * Math.log(pitchInHz / 440f) / Math.log(2f);
+                        }
                         TextView text = (TextView) findViewById(R.id.textView);
-                        text.setText("" + pitchInHz);
-                        visView.addAmplitude(pitchInHz*70); // update the VisualizeView
+                        text.setText("" + semitone);
+                        float fsemi = (float)semitone;
+                        visView.addAmplitude(fsemi); // update the VisualizeView
                         visView.invalidate(); // refresh the VisualizerView
+                        int ntime = videoView.getCurrentPosition();
+                        if(ntime/10000 >= segChart.size()){
+                            List<List<Float>> newChart = new ArrayList<>();
+                            visView.addback( newChart);}
+                        else{visView.addback(segChart.get(ntime/10000));}
+                        text2.setText("" + ntime);
+                        if (ntime - nframe*10000 > 0) {
+                            nframe ++;
+                            visView.clear(); // remove oldest power value
+                        }
                     }
                 });
-
             }
         }));
         new Thread(dispatcher, "Audio Dispatcher").start();
 
-        visLayout.removeAllViews();
-        visLayout.addView(visView);
     }
 
 
@@ -67,13 +114,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         videoView = (VideoView) findViewById(R.id.videoView);
         btn_start = (Button) findViewById(R.id.btn_start);
         btn_pause = (Button) findViewById(R.id.btn_pause);
-        btn_stop = (Button) findViewById(R.id.btn_stop);
         visLayout = (LinearLayout) findViewById(R.id.visualizer);
 
 
         btn_start.setOnClickListener(this);
         btn_pause.setOnClickListener(this);
-        btn_stop.setOnClickListener(this);
 
         //根据文件路径播放
         //if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -81,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //}
 
         //读取放在 raw 目录下的文件
-        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.heart));
+        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.wubai));
         videoView.setMediaController(new MediaController(this));
     }
 
@@ -94,9 +139,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_pause:
                 videoView.pause();
                 break;
-            case R.id.btn_stop:
-                videoView.stopPlayback();
-                break;
         }
     }
+    public void readCSVAndChop() {
+        try{
+            CSVReader reader = new CSVReader(new InputStreamReader(getResources().openRawResource(R.raw.love_song)));//Specify asset file name
+            String [] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                barChart.add(Arrays.asList(Float.valueOf(nextLine[0]),Float.valueOf(nextLine[1]),Float.valueOf(nextLine[2])));
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        }
+
 }

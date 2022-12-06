@@ -27,16 +27,16 @@
             android:layout_height="wrap_content"
             android:text="pause" />
 
-        <Button
-            android:id="@+id/btn_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="127dp"
+            android:layout_height="20dp"
+            android:text="hi" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="54dp"
+        android:id="@+id/textView2"
+        android:layout_width="398dp"
         android:layout_height="20dp"
         android:text="123" />
 
@@ -46,4 +46,5 @@
         android:layout_height="match_parent"
         android:background="@drawable/view_segment"
         android:orientation="vertical" />
+
 </LinearLayout>
