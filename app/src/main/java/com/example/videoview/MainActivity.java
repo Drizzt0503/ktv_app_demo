@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //}
 
         //读取放在 raw 目录下的文件
-        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.wubai));
+        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.ksong));
         videoView.setMediaController(new MediaController(this));
     }
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void readCSVAndChop() {
         try{
-            CSVReader reader = new CSVReader(new InputStreamReader(getResources().openRawResource(R.raw.love_song)));//Specify asset file name
+            CSVReader reader = new CSVReader(new InputStreamReader(getResources().openRawResource(R.raw.ksong_ly)));//Specify asset file name
             String [] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 barChart.add(Arrays.asList(Float.valueOf(nextLine[0]),Float.valueOf(nextLine[1]),Float.valueOf(nextLine[2])));

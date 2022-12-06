@@ -77,7 +77,7 @@ public class VisualizerView extends View {
        // }
         int middle = height / 2; // get the middle of the View
         float height2 = height-50;
-        float heightre = height2/18f;
+        float heightre = height2/22f;
         float widthre = (width-100)/10;
         float curX = 0; // start curX at zero
         if(!(segment.isEmpty())) {
@@ -85,7 +85,7 @@ public class VisualizerView extends View {
                 float a = segline.get(0) * widthre;
                 float b = segline.get(1) * widthre;
                 float c = (segline.get(2) +0.5f)* heightre;
-                canvas.drawRect(a, height2*70.5f/18f-c, b, height2*70.5f/18f-c+height2/18f , linePaint2);
+                canvas.drawRect(a, height2*67.5f/22f-c, b, height2*67.5f/22f-c+height2/22f , linePaint2);
             }
         }
         // for each item in the amplitudes ArrayList
@@ -94,7 +94,7 @@ public class VisualizerView extends View {
             curX += 5.53f; // increase X by LINE_WIDTH
 
             // draw a line representing this item in the amplitudes ArrayLis
-            canvas.drawLine(curX, height2*70.5f/18f - scaledHeight , curX+5.53f, height2*70.5f/18f - scaledHeight, linePaint);
+            canvas.drawLine(curX, height2*67.5f/22f - scaledHeight , curX+5.53f, height2*67.5f/22f - scaledHeight, linePaint);
         }
     }
 
