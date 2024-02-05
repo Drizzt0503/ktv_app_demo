@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             segChart.add(temp);
         }
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, new PitchDetectionHandler() {
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(44100, 2048, 1536);
+        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 44100, 2048, new PitchDetectionHandler() {
 
             @Override
             public void handlePitch(PitchDetectionResult pitchDetectionResult,
@@ -84,8 +84,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             semitone = 0;
                         }
                         else{
+                            //semitone = 138 + 24 * Math.log(pitchInHz / 440f) / Math.log(2f);
                             semitone = 69 + 12 * Math.log(pitchInHz / 440f) / Math.log(2f);
                         }
+                        //float semitoner = Math.round(semitone)/2f;
                         TextView text = (TextView) findViewById(R.id.textView);
                         text.setText("" + semitone);
                         float fsemi = (float)semitone;
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //}
 
         //读取放在 raw 目录下的文件
-        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.ksong));
+        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dontleave));
         videoView.setMediaController(new MediaController(this));
     }
 
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void readCSVAndChop() {
         try{
-            CSVReader reader = new CSVReader(new InputStreamReader(getResources().openRawResource(R.raw.ksong_ly)));//Specify asset file name
+            CSVReader reader = new CSVReader(new InputStreamReader(getResources().openRawResource(R.raw.dontleave_ly2)));//Specify asset file name
             String [] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 barChart.add(Arrays.asList(Float.valueOf(nextLine[0]),Float.valueOf(nextLine[1]),Float.valueOf(nextLine[2])));

@@ -64,7 +64,7 @@ public class VisualizerView extends View {
         amplitudes.add(amplitude); // add newest to the amplitudes ArrayList
 
         // if the power lines completely fill the VisualizerView
-        if (amplitudes.size() * LINE_WIDTH >= width) {
+        if (amplitudes.size() * 5.53f/4f >= width) {
             amplitudes.remove(0); // remove oldest power value
         }
     }
@@ -77,7 +77,9 @@ public class VisualizerView extends View {
        // }
         int middle = height / 2; // get the middle of the View
         float height2 = height-50;
-        float heightre = height2/22f;
+        float highp = 70f+0.5f;
+        float pdif = 30f;
+        float heightre = height2/pdif;
         float widthre = (width-100)/10;
         float curX = 0; // start curX at zero
         if(!(segment.isEmpty())) {
@@ -85,16 +87,16 @@ public class VisualizerView extends View {
                 float a = segline.get(0) * widthre;
                 float b = segline.get(1) * widthre;
                 float c = (segline.get(2) +0.5f)* heightre;
-                canvas.drawRect(a, height2*67.5f/22f-c, b, height2*67.5f/22f-c+height2/22f , linePaint2);
+                canvas.drawRect(a, heightre*highp-c, b, heightre*highp-c+heightre , linePaint2);
             }
         }
-        // for each item in the amplitudes ArrayList
+        //for each item in the amplitudes ArrayList
         for (float power : amplitudes) {
-            float scaledHeight = power*heightre; // scale the power
-            curX += 5.53f; // increase X by LINE_WIDTH
+            float scaledHeight = heightre*highp - power*heightre; // scale the power
+            curX += 5.53f/2f; // increase X by LINE_WIDTH
 
             // draw a line representing this item in the amplitudes ArrayLis
-            canvas.drawLine(curX, height2*67.5f/22f - scaledHeight , curX+5.53f, height2*67.5f/22f - scaledHeight, linePaint);
+            canvas.drawLine(curX, scaledHeight , curX+5.53f/2f, scaledHeight, linePaint);
         }
     }
 
